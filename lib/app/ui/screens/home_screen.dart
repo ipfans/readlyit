@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
+import 'package:readlyit/l10n/app_localizations.dart'; // Import for localization
 import 'package:readlyit/features/articles/data/models/article_model.dart';
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart';
 import 'package:readlyit/features/articles/presentation/screens/article_view_screen.dart'; // Add this import
@@ -96,8 +96,10 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  @override
-  // ... (_showAddArticleDialog, _confirmDeleteArticle remain the same)
+  // Modify this method in HomeScreen
+  void _initiatePocketImport(BuildContext context, WidgetRef ref) async { // Make it async
+    final articlesNotifier = ref.read(articlesListProvider.notifier);
+    final scaffoldMessenger = ScaffoldMessenger.of(context); // Cache ScaffoldMessenger
 
   // Modify this method in HomeScreen
   void _initiatePocketImport(BuildContext context, WidgetRef ref) async { // Make it async
@@ -241,10 +243,6 @@ class HomeScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddArticleDialog(context, ref),
         tooltip: AppLocalizations.of(context)!.tooltipAddArticle,
-                }
-
-          }
-
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: const custom_widgets.CustomBottomNavigation(),
