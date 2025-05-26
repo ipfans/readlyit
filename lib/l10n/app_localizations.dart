@@ -403,6 +403,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pocket authentication successful! Starting article import...'**
   String get pocketAuthSuccessImportStarting;
+
+  /// No description provided for @settingsThemeModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Mode'**
+  String get settingsThemeModeTitle;
+
+  /// No description provided for @settingsThemeModeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get settingsThemeModeSystem;
+
+  /// No description provided for @settingsThemeModeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsThemeModeLight;
+
+  /// No description provided for @settingsThemeModeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settingsThemeModeDark;
+
+  /// No description provided for @settingsThemeColorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Color'**
+  String get settingsThemeColorTitle;
+
+  /// No description provided for @settingsLanguageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguageTitle;
+
+  /// No description provided for @languageNameEn.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageNameEn;
+
+  /// No description provided for @languageNameZh.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese'**
+  String get languageNameZh;
+
+  /// No description provided for @settingsFontSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Font Settings'**
+  String get settingsFontSettingsTitle;
+
+  /// No description provided for @settingsFontSettingsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This app uses your device\'s system font size settings. You can adjust the font size in your phone\'s Display or Accessibility settings.'**
+  String get settingsFontSettingsDescription;
+
+  /// No description provided for @settingsPocketAuthRedirectPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Please authorize with Pocket in your browser. The app will continue once authorization is complete.'**
+  String get settingsPocketAuthRedirectPrompt;
 }
 
 class _AppLocalizationsDelegate

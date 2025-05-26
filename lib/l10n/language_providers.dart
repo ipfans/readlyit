@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart'; // For Locale
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // To access supportedLocales
+import 'package:readlyit/l10n/app_localizations.dart'; // To access supportedLocales
 
 const String _languageCodeKey = 'app_language_code';
 
 // Notifier for Locale
 class LanguageNotifier extends StateNotifier<Locale> {
-  LanguageNotifier(this._prefs) : super(AppLocalizations.supportedLocales.first) { // Default to first supported locale (e.g., 'zh')
+  LanguageNotifier(this._prefs)
+    : super(AppLocalizations.supportedLocales.first) {
+    // Default to first supported locale (e.g., 'zh')
     _loadLanguage();
   }
   final SharedPreferences _prefs;
@@ -44,13 +46,16 @@ class LanguageNotifier extends StateNotifier<Locale> {
   // Helper to get a list of supported locales with their display names (optional)
   // This would typically involve mapping language codes to full names.
   // For now, just providing the locales.
-  List<Locale> get supportedLocales => AppLocalizations.supportedLocales.toList();
+  List<Locale> get supportedLocales =>
+      AppLocalizations.supportedLocales.toList();
 }
 
 // Provider for LanguageNotifier
 final languageProvider = StateNotifierProvider<LanguageNotifier, Locale>((ref) {
   // This will be overridden in main.dart after SharedPreferences is initialized
-  throw UnimplementedError('SharedPreferences not initialized for languageProvider');
+  throw UnimplementedError(
+    'SharedPreferences not initialized for languageProvider',
+  );
 });
 
 // Helper to get a list of AppLocalizations.supportedLocales for UI

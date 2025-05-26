@@ -183,4 +183,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pocketAuthSuccessImportStarting =>
       'Pocket authentication successful! Starting article import...';
+
+  @override
+  String get settingsThemeModeTitle => 'Theme Mode';
+
+  @override
+  String get settingsThemeModeSystem => 'System';
+
+  @override
+  String get settingsThemeModeLight => 'Light';
+
+  @override
+  String get settingsThemeModeDark => 'Dark';
+
+  @override
+  String get settingsThemeColorTitle => 'Theme Color';
+
+  @override
+  String get settingsLanguageTitle => 'Language';
+
+  @override
+  String get languageNameEn => 'English';
+
+  @override
+  String get languageNameZh => 'Chinese';
+
+  @override
+  String get settingsFontSettingsTitle => 'Font Settings';
+
+  @override
+  String get settingsFontSettingsDescription =>
+      'This app uses your device\'s system font size settings. You can adjust the font size in your phone\'s Display or Accessibility settings.';
+
+  @override
+  String get settingsPocketAuthRedirectPrompt =>
+      'Please authorize with Pocket in your browser. The app will continue once authorization is complete.';
 }
