@@ -319,6 +319,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Navigated to {pageName} (Placeholder)'**
   String navigatedToPagePlaceholder(String pageName);
+
+  /// No description provided for @settingsAppearanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearanceTitle;
+
+  /// No description provided for @settingsAppearanceCurrentSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently following system theme.'**
+  String get settingsAppearanceCurrentSystem;
+
+  /// No description provided for @settingsPocketTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket Integration'**
+  String get settingsPocketTitle;
+
+  /// No description provided for @settingsPocketStatusAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticated with Pocket'**
+  String get settingsPocketStatusAuthenticated;
+
+  /// No description provided for @settingsPocketLogoutButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get settingsPocketLogoutButton;
+
+  /// No description provided for @settingsPocketStatusNotAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected to Pocket'**
+  String get settingsPocketStatusNotAuthenticated;
+
+  /// No description provided for @settingsPocketLoginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Please use the \'Connect to Pocket\' option in the app bar on the main screen.'**
+  String get settingsPocketLoginPrompt;
+
+  /// No description provided for @settingsPocketStatusError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error checking Pocket status.'**
+  String get settingsPocketStatusError;
+
+  /// No description provided for @settingsICloudSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'iCloud Sync (iOS/macOS)'**
+  String get settingsICloudSyncTitle;
+
+  /// No description provided for @settingsICloudSyncStatusPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync status will be shown here.'**
+  String get settingsICloudSyncStatusPlaceholder;
+
+  /// No description provided for @pocketImportInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket import in progress...'**
+  String get pocketImportInProgress;
+
+  /// No description provided for @pocketImportSuccessNoArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket sync successful. No new articles found.'**
+  String get pocketImportSuccessNoArticles;
+
+  /// Success message when Pocket articles are imported
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket sync successful. Imported {count} new articles.'**
+  String pocketImportSuccessArticles(int count);
+
+  /// No description provided for @pocketAuthSuccessImportStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket authentication successful! Starting article import...'**
+  String get pocketAuthSuccessImportStarting;
 }
 
 class _AppLocalizationsDelegate

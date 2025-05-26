@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:readlyit/app/ui/screens/settings_screen.dart';
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // For AppLocalizations
+import 'package:readlyit/l10n/app_localizations.dart'; // For AppLocalizations
 // import 'package:readlyit/core/services/database_service.dart'; // Not directly needed if ArticlesListNotifier is well mocked
 import 'package:readlyit/features/articles/data/datasources/remote/pocket_service.dart'; // For PocketService
 import 'package:mockito/mockito.dart';

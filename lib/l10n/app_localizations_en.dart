@@ -134,4 +134,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String navigatedToPagePlaceholder(String pageName) {
     return 'Navigated to $pageName (Placeholder)';
   }
+
+  @override
+  String get settingsAppearanceTitle => 'Appearance';
+
+  @override
+  String get settingsAppearanceCurrentSystem =>
+      'Currently following system theme.';
+
+  @override
+  String get settingsPocketTitle => 'Pocket Integration';
+
+  @override
+  String get settingsPocketStatusAuthenticated => 'Authenticated with Pocket';
+
+  @override
+  String get settingsPocketLogoutButton => 'Logout';
+
+  @override
+  String get settingsPocketStatusNotAuthenticated => 'Not connected to Pocket';
+
+  @override
+  String get settingsPocketLoginPrompt =>
+      'Please use the \'Connect to Pocket\' option in the app bar on the main screen.';
+
+  @override
+  String get settingsPocketStatusError => 'Error checking Pocket status.';
+
+  @override
+  String get settingsICloudSyncTitle => 'iCloud Sync (iOS/macOS)';
+
+  @override
+  String get settingsICloudSyncStatusPlaceholder =>
+      'Sync status will be shown here.';
+
+  @override
+  String get pocketImportInProgress => 'Pocket import in progress...';
+
+  @override
+  String get pocketImportSuccessNoArticles =>
+      'Pocket sync successful. No new articles found.';
+
+  @override
+  String pocketImportSuccessArticles(int count) {
+    return 'Pocket sync successful. Imported $count new articles.';
+  }
+
+  @override
+  String get pocketAuthSuccessImportStarting =>
+      'Pocket authentication successful! Starting article import...';
 }

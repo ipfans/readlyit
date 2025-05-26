@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:readlyit/l10n/app_localizations.dart';
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart'; // For Pocket & iCloud status/actions
 
 class SettingsScreen extends ConsumerWidget {
