@@ -1,5 +1,7 @@
-// import 'dart:io'; // Required for Platform.isIOS/isMacOS checks
+import 'dart:io' show Platform; // Required for Platform.isIOS/isMacOS checks
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart'; // For PlatformException regarding uni_links
+import 'package:url_launcher/url_launcher.dart'; // For launching URLs
 import 'package:readlyit/core/services/database_service.dart';
 import 'package:readlyit/features/articles/data/datasources/remote/pocket_service.dart';
 import 'package:readlyit/features/articles/data/datasources/remote/icloud_service.dart';
@@ -19,23 +21,32 @@ class ArticlesListNotifier extends StateNotifier<AsyncValue<List<ArticleModel>>>
 
   ArticlesListNotifier(this._databaseService, this._ref /*, this._iCloudService*/)
       : super(const AsyncValue.loading()) {
-    _loadArticles();
+    _loadArticles().then((_) { // Ensure _loadArticles completes before initial sync
+      // Optional Enhancement: Initial Auto-Sync
+      if (_iCloudService != null) { 
+        print('[ArticlesListNotifier] Initializing: Triggering first iCloud sync.');
+        synchronizeWithCloud().catchError((e, s) {
+          print('[ArticlesListNotifier] Error during initial auto-sync: $e, Stack: $s');
+          // state is already handled by synchronizeWithCloud if it errors,
+          // or by _loadArticles if that failed.
+        });
+      }
+    });
     // if (_iCloudService != null) {
     //   _listenToCloudChanges(); // Conceptual: Start listening to iCloud changes
     // }
   }
 
   ICloudService? get _iCloudService {
-    // Dynamically get iCloudService only if on relevant platform and enabled
-    // For placeholder, we assume it's always available if provider is used.
-    // In real app: check Platform.isIOS || Platform.isMacOS
-    try {
-      return _ref.read(iCloudServiceProvider);
-    } catch (e) {
-      // Provider not available or other error
-      print('[ArticlesListNotifier] iCloudService not available: $e');
-      return null;
+    if (Platform.isIOS || Platform.isMacOS) {
+      try {
+        return _ref.read(iCloudServiceProvider);
+      } catch (e) {
+        print('[ArticlesListNotifier] iCloudService could not be initialized or read: $e');
+        return null;
+      }
     }
+    return null; // Not on iOS/macOS
   }
 
   Future<void> _loadArticles() async {
@@ -171,69 +182,83 @@ class ArticlesListNotifier extends StateNotifier<AsyncValue<List<ArticleModel>>>
 
   // Method to handle incoming changes from iCloud (this is the hard part)
   Future<void> synchronizeWithCloud() async {
-    print('[ArticlesListNotifier] Starting conceptual full synchronization with iCloud...');
-    // if (!(Platform.isIOS || Platform.isMacOS)) return;
     if (_iCloudService == null) {
-      print('[ArticlesListNotifier] iCloud service not available, skipping sync.');
+      print('[ArticlesListNotifier] iCloud service not available or not on iOS/macOS, skipping sync.');
+      // Optionally, refresh local articles if in a loading state from a previous attempt
+      // if (state is AsyncLoading) await _loadArticles();
       return;
     }
 
+    print('[ArticlesListNotifier] Starting full synchronization with iCloud...');
     state = const AsyncValue.loading(); // Indicate sync in progress
 
     try {
-      final localArticles = await _databaseService.getAllArticles();
-      final cloudArticles = await _iCloudService!.fetchArticlesFromCloud();
-      // final lastCloudSync = await _iCloudService.getLastSyncTimestamp(); // For more advanced sync
+      // 1. Fetch local and cloud articles
+      final List<ArticleModel> localArticles = await _databaseService.getAllArticles();
+      final List<ArticleModel> cloudArticles = await _iCloudService!.fetchArticlesFromCloud();
+      // Consider fetching last sync timestamp for delta sync (more advanced)
+      // final DateTime? lastSyncTime = await _iCloudService!.getLastSyncTimestamp();
 
-      // This requires a robust 2-way sync logic:
-      // 1. Get local articles modified since lastCloudSync.
-      // 2. Get cloud articles modified since lastCloudSync (needs server-side timestamp or diffing).
-      // 3. Identify new, modified, deleted items on both sides.
-      // 4. Resolve conflicts (e.g., using `_iCloudService.resolveConflict`).
-      //    - Local new, Cloud doesn't have -> Add to Cloud
-      //    - Cloud new, Local doesn't have -> Add to Local
-      //    - Both modified -> Resolve conflict, then update both
-      //    - Local deleted, Cloud has -> Delete from Cloud
-      //    - Cloud deleted, Local has -> Delete from Local
+      final Map<String, ArticleModel> localArticlesMap = {for (var a in localArticles) a.id: a};
+      final Map<String, ArticleModel> cloudArticlesMap = {for (var a in cloudArticles) a.id: a};
+      final Set<String> allIds = {...localArticlesMap.keys, ...cloudArticlesMap.keys};
 
-      // Simplified placeholder: merge based on ID, cloud wins for conflicts for now
-      Map<String, ArticleModel> localArticlesMap = {for (var a in localArticles) a.id: a};
-      Map<String, ArticleModel> cloudArticlesMap = {for (var a in cloudArticles) a.id: a};
-      Set<String> allIds = {...localArticlesMap.keys, ...cloudArticlesMap.keys};
+      List<Future<void>> syncOperations = [];
 
       for (String id in allIds) {
         ArticleModel? local = localArticlesMap[id];
         ArticleModel? cloud = cloudArticlesMap[id];
 
-        if (local == null && cloud != null) { // New in cloud
-          await _databaseService.addArticle(cloud);
-        } else if (local != null && cloud == null) { // New locally (or deleted in cloud)
-          await _iCloudService!.syncArticleToCloud(local); // Sync local to cloud
-        } else if (local != null && cloud != null) { // Exists in both
-          // This is where proper conflict resolution based on timestamps or content is needed
-          // For this placeholder, if they are different, assume cloud is "more recent"
-          // A real implementation needs a 'modifiedAt' field or better diffing.
-          if (local.hashCode != cloud.hashCode) { // Basic check, not robust
-             final resolved = _iCloudService!.resolveConflict(local, cloud); // Use defined strategy
-             await _databaseService.updateArticle(resolved); // Update local
-             if (resolved.id == cloud.id && resolved.hashCode != cloud.hashCode) { // If resolved is different from original cloud
-                await _iCloudService!.syncArticleToCloud(resolved); // Sync resolved back to cloud
-             } else if (resolved.id == local.id && resolved.hashCode != local.hashCode) {
-                // if local was chosen and it was different, it's already in local db.
-             }
+        if (local == null && cloud != null) {
+          // Article exists in Cloud, but not locally: Add to local
+          print('[SYNC] Article $id new from cloud. Adding locally.');
+          syncOperations.add(_databaseService.addArticle(cloud));
+        } else if (local != null && cloud == null) {
+          // Article exists locally, but not in Cloud: Add to Cloud
+          // This could also mean it was deleted from another device.
+          // A more robust sync would use tombstones or explicit delete flags.
+          // For now, assume local additions should be synced.
+          print('[SYNC] Article $id new locally. Syncing to cloud.');
+          syncOperations.add(_iCloudService!.syncArticleToCloud(local));
+        } else if (local != null && cloud != null) {
+          // Article exists in both. Compare and resolve.
+          // A proper 'modifiedAt' timestamp is crucial here. 'savedAt' might not always reflect modifications.
+          // Using hashCode is a basic check for any difference.
+          if (local.hashCode != cloud.hashCode) { // Simple diff check
+            ArticleModel resolved = _iCloudService!.resolveConflict(local, cloud);
+            print('[SYNC] Article $id conflict. Resolved. Winner: ${resolved == local ? "local" : "cloud"}');
+            
+            // Update local if resolved is different from local
+            if (resolved.hashCode != local.hashCode) {
+               print('[SYNC] Updating local article $id with resolved version.');
+               syncOperations.add(_databaseService.updateArticle(resolved));
+            }
+            // Sync to cloud if resolved is different from cloud (or if local was chosen and it's "newer")
+            // This ensures the resolved version is propagated.
+            // If resolved is identical to cloud, this call might be redundant but safe.
+            // If resolved is identical to local (and local was chosen), this syncs local's state.
+            print('[SYNC] Syncing resolved article $id back to cloud (if necessary).');
+            syncOperations.add(_iCloudService!.syncArticleToCloud(resolved));
           }
         }
       }
-      // For items deleted locally but still in cloud (if not handled by `local != null && cloud == null` logic above)
-      // and items deleted in cloud but still local. A more robust sync would track deletions.
+      
+      // Wait for all database and cloud operations to complete
+      await Future.wait(syncOperations);
 
-      await _loadArticles(); // Refresh UI from local DB
+      // After sync, update the last sync timestamp
       await _iCloudService!.updateLastSyncTimestamp();
-      print('[ArticlesListNotifier] Conceptual full synchronization with iCloud finished.');
+      
+      print('[ArticlesListNotifier] Full synchronization with iCloud finished.');
+
     } catch (e, s) {
       print('[ArticlesListNotifier] Error during iCloud synchronization: $e, Stack: $s');
       state = AsyncValue.error(e, s); // Update state to reflect error
+      return; // Exit early on error
     }
+    
+    // Finally, reload articles from local DB to reflect all changes
+    await _loadArticles();
   }
 
   // Consider listening to iCloudService.iCloudArticlesStream for real-time updates
@@ -287,6 +312,63 @@ class ArticlesListNotifier extends StateNotifier<AsyncValue<List<ArticleModel>>>
       throw Exception('Failed to fetch and store content: ${e.toString().replaceFirst("Exception: ", "")}');
     }
   }
+
+  // --- Pocket Integration Methods ---
+
+  Future<String?> initiatePocketAuthentication() async {
+    // Returns an error message string if failed, null if successful in launching URL
+    final pocketService = _ref.read(pocketServiceProvider);
+    try {
+      final requestToken = await pocketService.obtainRequestToken();
+      if (requestToken != null) {
+        final authUrl = pocketService.getAuthorizationUrl(requestToken);
+        final uri = Uri.parse(authUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+          return null; // Success in launching
+        } else {
+          print('[ArticlesListNotifier] Could not launch Pocket URL: $authUrl');
+          return 'Could not launch Pocket authorization URL.';
+        }
+      } else {
+        print('[ArticlesListNotifier] Failed to obtain Pocket request token.');
+        return 'Failed to obtain Pocket request token.';
+      }
+    } catch (e) {
+      print('[ArticlesListNotifier] Error during Pocket authentication initiation: $e');
+      return 'An error occurred during Pocket authentication: ${e.toString()}';
+    }
+  }
+
+  Future<String?> completePocketAuthenticationAndFetchArticles() async {
+    // Returns an error message string if failed, null if successful
+    final pocketService = _ref.read(pocketServiceProvider);
+    try {
+      final success = await pocketService.obtainAccessToken();
+      if (success) {
+        final articles = await pocketService.fetchArticles();
+        // No need to check if articles.isNotEmpty here, addImportedArticles can handle empty list
+        await addImportedArticles(articles); // Use existing method to add to DB and refresh UI
+        print('[ArticlesListNotifier] Pocket authentication successful, ${articles.length} articles fetched.');
+        return null; 
+      } else {
+        print('[ArticlesListNotifier] Failed to obtain Pocket access token.');
+        return 'Failed to obtain Pocket access token.';
+      }
+    } catch (e) {
+      print('[ArticlesListNotifier] Error completing Pocket authentication or fetching articles: $e');
+      return 'An error occurred while finalizing Pocket setup: ${e.toString()}';
+    }
+  }
+
+  Future<void> logoutFromPocket() async {
+    final pocketService = _ref.read(pocketServiceProvider);
+    await pocketService.logout();
+    print('[ArticlesListNotifier] Logged out from Pocket.');
+    // Consider if a UI refresh or clearing of Pocket-specific data is needed here.
+    // For now, just logging out. If articles from Pocket are specially tagged or handled,
+    // you might want to call _loadArticles() or filter them out.
+  }
 }
 
 // 3. StateNotifierProvider for ArticlesListNotifier
@@ -313,6 +395,12 @@ final iCloudServiceProvider = Provider<ICloudService>((ref) {
 // 6. Provider for ArticleContentFetcherService
 final articleContentFetcherServiceProvider = Provider<ArticleContentFetcherService>((ref) {
   return ArticleContentFetcherService();
+});
+
+// 7. Provider to check if Pocket user is authenticated
+final pocketIsAuthenticatedProvider = FutureProvider<bool>((ref) async {
+  final pocketService = ref.watch(pocketServiceProvider);
+  return await pocketService.isAuthenticated();
 });
 
 // Example of a FamilyProvider if we need to fetch a single article by ID

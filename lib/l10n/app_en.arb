@@ -1,5 +1,103 @@
 {
     "@@locale": "en",
     "appTitle": "ReadlyIt",
-    "helloWorld": "Hello World!"
+    "helloWorld": "Hello World!",
+    "addArticleTitle": "Add New Article",
+    "deleteArticleTitle": "Delete Article?",
+    "enterArticleUrlHint": "Enter article URL",
+    "enterArticleTitleHint": "Enter title (optional)",
+    "confirmDeleteArticleContent": "Are you sure you want to delete \"{articleTitle}\"?",
+    "@confirmDeleteArticleContent": {
+        "description": "Confirmation message for deleting an article",
+        "placeholders": {
+            "articleTitle": {
+                "type": "String",
+                "example": "My Awesome Article"
+            }
+        }
+    },
+    "buttonCancel": "Cancel",
+    "buttonSave": "Save",
+    "buttonDelete": "Delete",
+    "errorUrlCannotBeEmpty": "URL cannot be empty.",
+    "articlesListEmpty": "No articles saved yet. Add one!",
+    "errorLoadingArticles": "Error loading articles: {error}",
+    "@errorLoadingArticles": {
+        "description": "Error message when articles fail to load",
+        "placeholders": {
+            "error": {
+                "type": "Object",
+                "example": "Network error"
+            }
+        }
+    },
+    "buttonRetry": "Retry",
+    "tooltipAddArticle": "Add Article",
+    "tooltipDeleteArticle": "Delete Article",
+    "homeScreenTitle": "My Articles",
+    "fetchingContentText": "Fetching content...",
+    "failedToFetchContentText": "Failed to fetch content. Please try again.",
+    "contentNotFetchedYetText": "Full article content has not been fetched yet.",
+    "buttonFetchFullArticle": "Fetch Full Article",
+    "errorCouldNotLaunchUrl": "Could not launch URL: {url}. Invalid URL or no app to handle it.",
+    "@errorCouldNotLaunchUrl": {
+        "description": "Error when URL launching fails due to invalid URL or no handler",
+        "placeholders": {
+            "url": {
+                "type": "String",
+                "example": "https://example.com"
+            }
+        }
+    },
+    "errorCouldNotLaunchUrlGeneral": "Could not launch URL: {error}",
+    "@errorCouldNotLaunchUrlGeneral": {
+        "description": "General error when URL launching fails",
+        "placeholders": {
+            "error": {
+                "type": "Object",
+                "example": "Unknown error"
+            }
+        }
+    },
+    "errorFetchingContent": "Error fetching content: {errorMessage}",
+    "@errorFetchingContent": {
+        "description": "Error when fetching article content fails",
+        "placeholders": {
+            "errorMessage": {
+                "type": "String",
+                "example": "Network timeout"
+            }
+        }
+    },
+    "fetchedContentEmpty": "Fetched content is empty.",
+    "tooltipPocketOptions": "Pocket Options",
+    "tooltipConnectToPocket": "Connect to Pocket",
+    "tooltipPocketAuthError": "Pocket Auth Error. Tap to retry.",
+    "menuItemSyncPocketArticles": "Sync Pocket Articles",
+    "menuItemLogoutFromPocket": "Logout from Pocket",
+    "syncingPocketArticles": "Syncing Pocket articles...",
+    "pocketSyncFailed": "Pocket Sync Failed: {error}",
+    "@pocketSyncFailed": {
+        "description": "Error message when Pocket sync fails",
+        "placeholders": {
+            "error": {
+                "type": "Object",
+                "example": "API error"
+            }
+        }
+    },
+    "pocketSyncSuccessful": "Pocket Sync Successful!",
+    "loggedOutFromPocket": "Logged out from Pocket.",
+    "bottomNavArticles": "Articles",
+    "bottomNavSettings": "Settings",
+    "navigatedToPagePlaceholder": "Navigated to {pageName} (Placeholder)",
+    "@navigatedToPagePlaceholder": {
+        "description": "Placeholder message when navigating via bottom bar",
+        "placeholders": {
+            "pageName": {
+                "type": "String",
+                "example": "Settings"
+            }
+        }
+    }
 }
