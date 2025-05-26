@@ -1,19 +1,12 @@
 import 'dart:async'; // For StreamSubscription
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; 
-// import 'package:readlyit/app/ui/screens/home_screen.dart'; // Remove this
 import 'package:readlyit/app/ui/screens/main_navigation_screen.dart'; // Add this
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-// Imports for uni_links
+import 'package:readlyit/l10n/app_localizations.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:flutter/services.dart' show PlatformException;
-
-// Import your providers
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart';
-// Import theme providers
 import 'package:readlyit/app/ui/theme/theme_providers.dart';
-// Import language provider
 import 'package:readlyit/l10n/language_providers.dart';
 
 

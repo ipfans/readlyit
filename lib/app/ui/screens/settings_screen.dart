@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart';
 import 'package:readlyit/app/ui/theme/theme_providers.dart'; 
 import 'package:readlyit/l10n/language_providers.dart';    
+import 'package:readlyit/l10n/app_localizations.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -26,12 +26,11 @@ class SettingsScreen extends ConsumerWidget {
      if (locale.languageCode == 'zh') return l10n.languageNameZh;
      return locale.toLanguageTag(); // Fallback
   }
-
+  
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final pocketAuthAsync = ref.watch(pocketIsAuthenticatedProvider);
-
     final currentThemeMode = ref.watch(themeModeProvider);
     final currentSeedColor = ref.watch(seedColorProvider);
     final currentLocale = ref.watch(languageProvider);
@@ -42,7 +41,6 @@ class SettingsScreen extends ConsumerWidget {
       ),
       body: ListView(
         children: <Widget>[
-          // --- Appearance Section ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Adjusted vertical padding
             child: Text(l10n.settingsAppearanceTitle, style: Theme.of(context).textTheme.titleMedium),
@@ -126,8 +124,6 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const Divider(),
-
-          // --- Pocket Integration Section ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Text(l10n.settingsPocketTitle, style: Theme.of(context).textTheme.titleMedium),
@@ -187,8 +183,6 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const Divider(),
-
-          // --- iCloud Sync Section (Informational) ---
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Text(l10n.settingsICloudSyncTitle, style: Theme.of(context).textTheme.titleMedium),

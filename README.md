@@ -101,5 +101,4 @@ This is necessary, for example, after creating or updating mock definitions for 
 (To be added - guidelines for contributing to the project)
 
 ## License
-(To be added - e.g., MIT, Apache 2.0)
-```
+MIT
