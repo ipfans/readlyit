@@ -109,6 +109,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hello World!'**
   String get helloWorld;
+
+  /// No description provided for @addArticleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Article'**
+  String get addArticleTitle;
+
+  /// No description provided for @deleteArticleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Article?'**
+  String get deleteArticleTitle;
+
+  /// No description provided for @enterArticleUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter article URL'**
+  String get enterArticleUrlHint;
+
+  /// No description provided for @enterArticleTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter title (optional)'**
+  String get enterArticleTitleHint;
+
+  /// Confirmation message for deleting an article
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{articleTitle}\"?'**
+  String confirmDeleteArticleContent(String articleTitle);
+
+  /// No description provided for @buttonCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get buttonCancel;
+
+  /// No description provided for @buttonSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get buttonSave;
+
+  /// No description provided for @buttonDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get buttonDelete;
+
+  /// No description provided for @errorUrlCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'URL cannot be empty.'**
+  String get errorUrlCannotBeEmpty;
+
+  /// No description provided for @articlesListEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No articles saved yet. Add one!'**
+  String get articlesListEmpty;
+
+  /// Error message when articles fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading articles: {error}'**
+  String errorLoadingArticles(Object error);
+
+  /// No description provided for @buttonRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get buttonRetry;
+
+  /// No description provided for @tooltipAddArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Article'**
+  String get tooltipAddArticle;
+
+  /// No description provided for @tooltipDeleteArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Article'**
+  String get tooltipDeleteArticle;
+
+  /// No description provided for @homeScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Articles'**
+  String get homeScreenTitle;
+
+  /// No description provided for @fetchingContentText.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching content...'**
+  String get fetchingContentText;
+
+  /// No description provided for @failedToFetchContentText.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch content. Please try again.'**
+  String get failedToFetchContentText;
+
+  /// No description provided for @contentNotFetchedYetText.
+  ///
+  /// In en, this message translates to:
+  /// **'Full article content has not been fetched yet.'**
+  String get contentNotFetchedYetText;
+
+  /// No description provided for @buttonFetchFullArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch Full Article'**
+  String get buttonFetchFullArticle;
+
+  /// Error when URL launching fails due to invalid URL or no handler
+  ///
+  /// In en, this message translates to:
+  /// **'Could not launch URL: {url}. Invalid URL or no app to handle it.'**
+  String errorCouldNotLaunchUrl(String url);
+
+  /// General error when URL launching fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not launch URL: {error}'**
+  String errorCouldNotLaunchUrlGeneral(Object error);
+
+  /// Error when fetching article content fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching content: {errorMessage}'**
+  String errorFetchingContent(String errorMessage);
+
+  /// No description provided for @fetchedContentEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetched content is empty.'**
+  String get fetchedContentEmpty;
+
+  /// No description provided for @tooltipPocketOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket Options'**
+  String get tooltipPocketOptions;
+
+  /// No description provided for @tooltipConnectToPocket.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to Pocket'**
+  String get tooltipConnectToPocket;
+
+  /// No description provided for @tooltipPocketAuthError.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket Auth Error. Tap to retry.'**
+  String get tooltipPocketAuthError;
+
+  /// No description provided for @menuItemSyncPocketArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Pocket Articles'**
+  String get menuItemSyncPocketArticles;
+
+  /// No description provided for @menuItemLogoutFromPocket.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout from Pocket'**
+  String get menuItemLogoutFromPocket;
+
+  /// No description provided for @syncingPocketArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing Pocket articles...'**
+  String get syncingPocketArticles;
+
+  /// Error message when Pocket sync fails
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket Sync Failed: {error}'**
+  String pocketSyncFailed(Object error);
+
+  /// No description provided for @pocketSyncSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Pocket Sync Successful!'**
+  String get pocketSyncSuccessful;
+
+  /// No description provided for @loggedOutFromPocket.
+  ///
+  /// In en, this message translates to:
+  /// **'Logged out from Pocket.'**
+  String get loggedOutFromPocket;
+
+  /// No description provided for @bottomNavArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Articles'**
+  String get bottomNavArticles;
+
+  /// No description provided for @bottomNavSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get bottomNavSettings;
+
+  /// Placeholder message when navigating via bottom bar
+  ///
+  /// In en, this message translates to:
+  /// **'Navigated to {pageName} (Placeholder)'**
+  String navigatedToPagePlaceholder(String pageName);
 }
 
 class _AppLocalizationsDelegate

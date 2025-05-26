@@ -1,34 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // Added
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readlyit/l10n/app_localizations.dart';
 import 'package:readlyit/features/articles/data/models/article_model.dart';
-import 'package:readlyit/features/articles/presentation/providers/article_providers.dart'; // Added
-import 'package:flutter_html/flutter_html.dart'; // Added for HTML rendering
-import 'package:url_launcher/url_launcher.dart'; // Added for launching URLs
+import 'package:readlyit/features/articles/presentation/providers/article_providers.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
+class ArticleViewScreen extends ConsumerWidget {
   final ArticleModel article;
 
   const ArticleViewScreen({super.key, required this.article});
 
-  // Ensure this method is uncommented and within the ArticleViewScreen class
-  Future<void> _launchURL(BuildContext context, String url) async { // Added BuildContext for ScaffoldMessenger
+  Future<void> _launchURL(BuildContext context, String url) async {
     final Uri uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       try {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } catch (e) {
-        if (mounted(context)) { // Use the mounted helper
-           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLocalizations.of(context)!.errorCouldNotLaunchUrlGeneral(e.toString()))),
+        if (_isMounted(context)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.errorCouldNotLaunchUrlGeneral(e.toString()),
+              ),
+            ),
           );
         }
         print('Error launching URL: $e');
       }
     } else {
-      if (mounted(context)) { // Use the mounted helper
-         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.errorCouldNotLaunchUrl(url))),
+      if (_isMounted(context)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.errorCouldNotLaunchUrl(url),
+            ),
+          ),
         );
       }
       print('Could not launch $url');
@@ -96,8 +103,8 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
                   Column(
                     children: [
                       if (currentArticle.content == "Fetching...")
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -133,7 +140,7 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
                                print("Error caught in UI: $e, Stack: $stackTrace");
                                // The notifier's catchError already tries to update the article content to "Failed to fetch."
                                // and reloads. If that specific UI update isn't enough, show a SnackBar.
-                               if (mounted(context)) { // Check if widget is still in the tree
+                               if (_isMounted(context)) { // Check if widget is still in the tree
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(AppLocalizations.of(context)!.errorFetchingContent(e.toString().replaceFirst("Exception: ", ""))))
                                   );
@@ -176,7 +183,7 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
                     ),
                   )
                 else if (currentArticle.content != null && currentArticle.content!.isEmpty)
-                   const Center( // If content is fetched but empty string
+                   Center( // If content is fetched but empty string
                      child: Padding(
                        padding: const EdgeInsets.all(16.0),
                        child: Text(
@@ -196,7 +203,7 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
   }
 
   // Helper to check if the widget is still mounted, for use in async callbacks
-  bool mounted(BuildContext context) {
+  bool _isMounted(BuildContext context) {
     try {
       // Attempt to access a property that would throw if not mounted,
       // but without causing side effects or relying on internal Flutter details.

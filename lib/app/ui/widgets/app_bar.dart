@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
+import 'package:readlyit/l10n/app_localizations.dart'; // Import for localization
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart'; // For pocketIsAuthenticatedProvider & articlesListProvider
 
 class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget { // Make it ConsumerWidget

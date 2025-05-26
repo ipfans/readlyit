@@ -1,5 +1,91 @@
 {
     "@@locale": "zh",
     "appTitle": "阅",
-    "helloWorld": "你好，世界！"
-} 
+    "helloWorld": "你好，世界！",
+    "addArticleTitle": "添加新文章",
+    "deleteArticleTitle": "删除文章？",
+    "enterArticleUrlHint": "输入文章链接",
+    "enterArticleTitleHint": "输入标题（可选）",
+    "confirmDeleteArticleContent": "您确定要删除“{articleTitle}”吗？",
+    "@confirmDeleteArticleContent": {
+        "description": "确认删除文章的提示信息",
+        "placeholders": {
+            "articleTitle": {
+                "type": "String",
+                "example": "我的精彩文章"
+            }
+        }
+    },
+    "buttonCancel": "取消",
+    "buttonSave": "保存",
+    "buttonDelete": "删除",
+    "errorUrlCannotBeEmpty": "链接不能为空。",
+    "articlesListEmpty": "还没有保存的文章。去添加一篇吧！",
+    "errorLoadingArticles": "加载文章出错：{error}",
+    "@errorLoadingArticles": {
+        "description": "文章加载失败时的错误信息",
+        "placeholders": {
+            "error": {
+                "type": "Object",
+                "example": "网络错误"
+            }
+        }
+    },
+    "buttonRetry": "重试",
+    "tooltipAddArticle": "添加文章",
+    "tooltipDeleteArticle": "删除文章",
+    "homeScreenTitle": "我的文章",
+    "fetchingContentText": "正在获取内容...",
+    "failedToFetchContentText": "获取内容失败，请重试。",
+    "contentNotFetchedYetText": "尚未获取全文内容。",
+    "buttonFetchFullArticle": "获取全文",
+    "errorCouldNotLaunchUrl": "无法启动URL链接：{url}。链接无效或没有应用可以处理它。",
+    "@errorCouldNotLaunchUrl": {
+        "description": "因URL无效或无处理器导致启动链接失败时的错误",
+        "placeholders": {
+            "url": {
+                "type": "String",
+                "example": "https://example.com"
+            }
+        }
+    },
+    "errorCouldNotLaunchUrlGeneral": "无法启动URL链接：{error}",
+    "@errorCouldNotLaunchUrlGeneral": {
+        "description": "启动URL链接时发生通用错误",
+        "placeholders": {
+            "error": {
+                "type": "Object",
+                "example": "未知错误"
+            }
+        }
+    },
+    "errorFetchingContent": "获取内容时发生错误：{errorMessage}",
+    "@errorFetchingContent": {
+        "description": "获取文章内容失败时的错误",
+        "placeholders": {
+            "errorMessage": {
+                "type": "String",
+                "example": "网络超时"
+            }
+        }
+    },
+    "fetchedContentEmpty": "获取到的内容为空。",
+    "tooltipPocketOptions": "Pocket选项",
+    "tooltipConnectToPocket": "连接到Pocket",
+    "tooltipPocketAuthError": "Pocket授权错误",
+    "menuItemSyncPocketArticles": "同步Pocket文章",
+    "menuItemLogoutFromPocket": "从Pocket注销",
+    "syncingPocketArticles": "正在同步Pocket文章...",
+    "pocketSyncFailed": "Pocket同步失败：{error}",
+    "@pocketSyncFailed": {
+        "description": "Pocket同步失败时的错误信息",
+        "placeholders": {
+            "error": {
+                "type": "Object",
+                "example": "接口错误"
+            }
+        }
+    },
+    "pocketSyncSuccessful": "Pocket同步成功！",
+    "loggedOutFromPocket": "已从Pocket注销。"
+}

@@ -2,7 +2,7 @@ import 'dart:async'; // For StreamSubscription
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; 
 import 'package:readlyit/app/ui/screens/home_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:readlyit/l10n/app_localizations.dart';
 
 // Imports for uni_links
 import 'package:uni_links/uni_links.dart';

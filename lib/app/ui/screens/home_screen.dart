@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
+import 'package:readlyit/l10n/app_localizations.dart'; // Import for localization
 import 'package:readlyit/features/articles/data/models/article_model.dart';
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart';
 import 'package:readlyit/features/articles/presentation/screens/article_view_screen.dart'; // Add this import
@@ -95,9 +95,6 @@ class HomeScreen extends ConsumerWidget {
       },
     );
   }
-
-  @override
-  // ... (_showAddArticleDialog, _confirmDeleteArticle remain the same)
 
   // Modify this method in HomeScreen
   void _initiatePocketImport(BuildContext context, WidgetRef ref) async { // Make it async
@@ -219,22 +216,6 @@ class HomeScreen extends ConsumerWidget {
                   },
                 );
               }
-            },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(AppLocalizations.of(context)!.errorLoadingArticles(error.toString())),
-              ElevatedButton(
-                onPressed: () => ref.read(articlesListProvider.notifier).refresh(),
-                child: Text(AppLocalizations.of(context)!.buttonRetry),
-              )
-            ],
-                ),
-              );
             },
           );
         },
