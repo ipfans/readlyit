@@ -1,9 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readlyit/app/app_widget.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// Import your new theme providers file
+import 'package:readlyit/app/ui/theme/theme_providers.dart';
+// Import language providers
+import 'package:readlyit/l10n/language_providers.dart';
 
-void main() {
-  // For Riverpod, we need to wrap the entire application in a ProviderScope
-  runApp(const ProviderScope(child: AppWidget()));
+
+Future<void> main() async { // Make main async
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure bindings are initialized
+
+  final prefs = await SharedPreferences.getInstance();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        themeModeProvider.overrideWith((ref) => ThemeModeNotifier(prefs)),
+        seedColorProvider.overrideWith((ref) => SeedColorNotifier(prefs)),
+        languageProvider.overrideWith((ref) => LanguageNotifier(prefs)), // Add this override
+      ],
+      child: const AppWidget(),
+    ),
+  );
 }

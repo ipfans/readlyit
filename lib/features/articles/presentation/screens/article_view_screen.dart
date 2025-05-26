@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Added
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
 import 'package:readlyit/features/articles/data/models/article_model.dart';
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart'; // Added
-// import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_html/flutter_html.dart'; // Added for HTML rendering
+import 'package:url_launcher/url_launcher.dart'; // Added for launching URLs
 
 class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
   final ArticleModel article;
 
   const ArticleViewScreen({super.key, required this.article});
 
-  // Future<void> _launchURL(String url) async {
-  //   final uri = Uri.parse(url);
-  //   if (await canLaunchUrl(uri)) {
-  //     await launchUrl(uri);
-  //   } else {
-  //     // Handle error: could not launch URL
-  //     print('Could not launch $url'); // Replace with user-friendly error
-  //   }
-  // }
+  // Ensure this method is uncommented and within the ArticleViewScreen class
+  Future<void> _launchURL(BuildContext context, String url) async { // Added BuildContext for ScaffoldMessenger
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      try {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        if (mounted(context)) { // Use the mounted helper
+           ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.errorCouldNotLaunchUrlGeneral(e.toString()))),
+          );
+        }
+        print('Error launching URL: $e');
+      }
+    } else {
+      if (mounted(context)) { // Use the mounted helper
+         ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorCouldNotLaunchUrl(url))),
+        );
+      }
+      print('Could not launch $url');
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) { // Added WidgetRef
@@ -53,7 +69,7 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
                 ),
                 const SizedBox(height: 8.0),
                 GestureDetector(
-                  // onTap: () => _launchURL(currentArticle.url),
+                  onTap: () => _launchURL(context, currentArticle.url), // Pass context
                   child: Text(
                     currentArticle.url,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -85,9 +101,9 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              CircularProgressIndicator(),
-                              SizedBox(width: 16),
-                              Text("Fetching content..."), // Replace with localized string
+                              const CircularProgressIndicator(),
+                              const SizedBox(width: 16),
+                              Text(AppLocalizations.of(context)!.fetchingContentText),
                             ],
                           ),
                         )
@@ -95,19 +111,19 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
                          Padding(
                            padding: const EdgeInsets.symmetric(vertical: 16.0),
                            child: Text(
-                             'Failed to fetch content. Please try again.', // Replace with localized string
+                             AppLocalizations.of(context)!.failedToFetchContentText,
                              style: TextStyle(color: Theme.of(context).colorScheme.error),
                            ),
                          )
                       else
-                        const Text(
-                          'Full article content has not been fetched yet.', // Replace with localized string
-                          style: TextStyle(fontStyle: FontStyle.italic),
+                        Text(
+                          AppLocalizations.of(context)!.contentNotFetchedYetText,
+                          style: const TextStyle(fontStyle: FontStyle.italic),
                         ),
                       const SizedBox(height: 16),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.download_outlined),
-                        label: const Text('Fetch Full Article'), // Replace with localized string
+                        label: Text(AppLocalizations.of(context)!.buttonFetchFullArticle),
                         // Disable button if content is currently being fetched
                         onPressed: currentArticle.content == "Fetching..." ? null : () {
                           // Show loading indicator while fetching
@@ -119,7 +135,7 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
                                // and reloads. If that specific UI update isn't enough, show a SnackBar.
                                if (mounted(context)) { // Check if widget is still in the tree
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Error fetching content: ${e.toString().replaceFirst("Exception: ", "")}')), // Replace with localized string
+                                    SnackBar(content: Text(AppLocalizations.of(context)!.errorFetchingContent(e.toString().replaceFirst("Exception: ", ""))))
                                   );
                                }
                             });
@@ -128,13 +144,49 @@ class ArticleViewScreen extends ConsumerWidget { // Changed to ConsumerWidget
                       const SizedBox(height: 16),
                     ],
                   ),
-                // TODO: If content is HTML, use flutter_html to render it. For now, display as text.
-                // Only display content if it's not a special state string
-                if (currentArticle.content != null && currentArticle.content != "Fetching..." && currentArticle.content != "Failed to fetch.")
-                  Text(
-                    currentArticle.content ?? '',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+                // Content display logic updated
+                if (currentArticle.content != null &&
+                    currentArticle.content!.isNotEmpty &&
+                    currentArticle.content != "Fetching..." &&
+                    currentArticle.content != "Failed to fetch.")
+                  SelectionArea( // Allow text selection of the HTML content
+                    child: Html(
+                      data: currentArticle.content!,
+                      style: { // Optional: basic styling
+                        "body": Style(
+                          fontSize: FontSize(Theme.of(context).textTheme.bodyLarge?.fontSize ?? 16.0),
+                          // Use a more specific selector if you only want to affect the root, not all descendants
+                        ),
+                        // Add more global styles or specific tag styles as needed
+                        // "p": Style(lineHeight: LineHeight.em(1.5)),
+                      },
+                      onLinkTap: (url, attributes, element) {
+                        if (url != null) {
+                          _launchURL(context, url);
+                        }
+                      },
+                      // Optional: Improve image rendering
+                      // onImageTap: (src, attributes, element) {
+                      //   // Handle image tap, e.g., open in a full-screen viewer
+                      // },
+                      // onImageError: (exception, stackTrace) {
+                      //   // Handle image loading errors
+                      //   print("Image loading error: $exception");
+                      // },
+                    ),
+                  )
+                else if (currentArticle.content != null && currentArticle.content!.isEmpty)
+                   const Center( // If content is fetched but empty string
+                     child: Padding(
+                       padding: const EdgeInsets.all(16.0),
+                       child: Text(
+                         AppLocalizations.of(context)!.fetchedContentEmpty,
+                         style: const TextStyle(fontStyle: FontStyle.italic),
+                       ),
+                     ),
+                   )
+                // The existing Column for "Fetching...", "Failed to fetch.", "Fetch Full Article" button
+                // remains and handles cases where content is not yet available or failed.
               ],
             ),
           ),

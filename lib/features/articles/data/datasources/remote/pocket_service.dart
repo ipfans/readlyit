@@ -1,122 +1,191 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:readlyit/features/articles/data/models/article_model.dart';
-import 'package:uuid/uuid.dart'; // For generating dummy IDs
+// Required for uni_links
+import 'package:uni_links/uni_links.dart'; 
+import 'package:flutter/services.dart'; // For PlatformException
 
-const _uuid = Uuid();
+// Define your Pocket consumer key here.
+// IMPORTANT: In a real app, this should NOT be hardcoded directly in source code.
+// Consider fetching it from a secure configuration file or environment variable at build time.
+const String _consumerKey = 'YOUR_POCKET_CONSUMER_KEY_HERE'; 
+// Define your redirect URI, this should match what you've configured in your Pocket app settings.
+// This will be used for the OAuth callback.
+const String _redirectUri = 'readlyit://pocket-auth'; 
 
-// Placeholder for Pocket API interaction
-// Actual implementation will require OAuth 2.0 flow and HTTP requests.
 class PocketService {
-  final String _consumerKey; // Needed for Pocket API
+  final Dio _dio;
+  final FlutterSecureStorage _secureStorage;
 
-  PocketService({String? consumerKey}) : _consumerKey = consumerKey ?? 'YOUR_POCKET_CONSUMER_KEY';
+  static const String _accessTokenKey = 'pocket_access_token';
+  static const String _requestTokenKey = 'pocket_request_token';
 
-  // Simulates obtaining a request token (part of OAuth)
-  Future<String?> getPocketRequestToken() async {
-    print('[PocketService] Simulating getPocketRequestToken...');
-    // In a real scenario, this would involve an HTTP request to Pocket.
-    // For now, simulate a delay and return a dummy token.
-    await Future.delayed(const Duration(seconds: 1));
-    final dummyRequestToken = 'dummy_request_token_${_uuid.v4()}';
-    print('[PocketService] Simulated request token: $dummyRequestToken');
-    return dummyRequestToken;
+  PocketService({Dio? dio, FlutterSecureStorage? secureStorage})
+      : _dio = dio ?? Dio(BaseOptions(baseUrl: 'https://getpocket.com/v3')),
+        _secureStorage = secureStorage ?? const FlutterSecureStorage();
+
+  Future<bool> isAuthenticated() async {
+    // Placeholder: Check if an access token exists.
+    // return await _secureStorage.containsKey(key: _accessTokenKey);
+    final token = await _secureStorage.read(key: _accessTokenKey);
+    return token != null && token.isNotEmpty;
   }
 
-  // Simulates exchanging a request token for an access token (part of OAuth)
-  // User would authorize via a webview using the request token.
-  Future<String?> getPocketAccessToken(String requestToken) async {
-    print('[PocketService] Simulating getPocketAccessToken for request token: $requestToken...');
-    // In a real scenario, this is the step after user authorizes the app.
-    // The app receives a redirect and then exchanges the (now authorized) request token.
-    await Future.delayed(const Duration(seconds: 1));
-    if (requestToken.startsWith('dummy_request_token_')) {
-      final dummyAccessToken = 'dummy_access_token_${_uuid.v4()}';
-      print('[PocketService] Simulated access token: $dummyAccessToken');
-      return dummyAccessToken;
-    }
-    print('[PocketService] Invalid request token for simulation.');
-    return null;
-  }
-
-  // Simulates fetching articles from Pocket
-  Future<List<ArticleModel>> fetchPocketArticles(String accessToken) async {
-    print('[PocketService] Simulating fetchPocketArticles with access token: $accessToken...');
-    if (!accessToken.startsWith('dummy_access_token_')) {
-      print('[PocketService] Invalid access token for simulation.');
-      return [];
-    }
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Return a list of dummy articles
-    final dummyArticles = [
-      ArticleModel.create(
-        url: 'https://example.com/pocket-article-1',
-        title: 'My First Pocket Article',
-        content: 'This is the content of the first article from Pocket.',
-        source: 'Pocket',
-        excerpt: 'A fascinating read about something important from Pocket.',
-      ),
-      ArticleModel.create(
-        url: 'https://example.com/pocket-article-2',
-        title: 'Another Interesting Read from Pocket',
-        content: 'Content for the second article, also synced from Pocket.',
-        source: 'Pocket',
-        excerpt: 'Exploring further topics via Pocket.',
-      ),
-    ];
-    print('[PocketService] Simulated fetching ${dummyArticles.length} articles.');
-    return dummyArticles;
-  }
-
-  // Placeholder for the full authentication and fetch flow
-  // This would typically involve a webview for user login if no existing token.
-  Future<bool> authenticateAndFetchArticles({
-    required Function(String url) openAuthUrl, // Callback to open webview
-    required Future<String?> Function() onRedirected, // Callback when Pocket redirects
-    required Function(List<ArticleModel> articles) onArticlesFetched,
-    required Function(String errorMessage) onError,
-  }) async {
-    print('[PocketService] Starting authenticateAndFetchArticles simulation...');
+  // Step 1: Obtain a request token from Pocket
+  Future<String?> obtainRequestToken() async {
+    // Placeholder: Implement Pocket API call to get a request token.
+    // POST to /oauth/request with consumer_key and redirect_uri
+    // Store the received request token securely.
+    // Return the request token or null on failure.
+    print('PocketService: Obtaining request token...');
     try {
-      // Step 1: Get Request Token
-      final requestToken = await getPocketRequestToken();
-      if (requestToken == null) {
-        onError('Failed to get Pocket request token.');
-        return false;
+      final response = await _dio.post('/oauth/request', data: {
+        'consumer_key': _consumerKey,
+        'redirect_uri': _redirectUri,
+      });
+      if (response.statusCode == 200 && response.data != null) {
+        final code = response.data['code'] as String?;
+        if (code != null) {
+          await _secureStorage.write(key: _requestTokenKey, value: code);
+          print('PocketService: Request token obtained and stored: $code');
+          return code;
+        }
       }
-
-      // Step 2: Construct Authorization URL & Ask User to Authorize
-      // This URL would redirect back to a custom scheme your app handles.
-      final authUrl = 'https://getpocket.com/auth/authorize?request_token=$requestToken&redirect_uri=readlyitapp:authorization_finished';
-      openAuthUrl(authUrl); // UI needs to open this in a webview
-
-      // Step 3: Wait for redirect and get authorized request token (simulated by onRedirected)
-      // In a real app, onRedirected would be triggered by the webview's redirect.
-      // For simulation, we assume it happens and returns the same token or a new one.
-      final authorizedRequestToken = await onRedirected(); // This is a bit simplified for simulation
-      
-      if (authorizedRequestToken == null) { // User might cancel or auth fails
-          onError('Pocket authentication cancelled or failed at redirect.');
-          return false;
-      }
-
-      // Step 4: Exchange for Access Token
-      // In reality, Pocket might give the *same* request token back, now authorized,
-      // or the redirect_uri might contain parameters. Let's assume we use the one from redirect.
-      final accessToken = await getPocketAccessToken(authorizedRequestToken); // Or simply use requestToken if that's how Pocket does it
-      if (accessToken == null) {
-        onError('Failed to get Pocket access token.');
-        return false;
-      }
-
-      // Step 5: Fetch Articles
-      final articles = await fetchPocketArticles(accessToken);
-      onArticlesFetched(articles);
-      print('[PocketService] Successfully fetched ${articles.length} articles from Pocket.');
-      return true;
+      print('PocketService: Failed to obtain request token. Status: ${response.statusCode}, Data: ${response.data}');
+      return null;
     } catch (e) {
-      print('[PocketService] Error during Pocket authentication/fetch: $e');
-      onError('An error occurred during Pocket integration: ${e.toString()}');
+      print('PocketService: Error obtaining request token: $e');
+      return null;
+    }
+  }
+
+  // Step 2: Redirect user to Pocket for authorization
+  // The URL is: https://getpocket.com/auth/authorize?request_token=YOUR_REQUEST_TOKEN&redirect_uri=YOUR_REDIRECT_URI
+  // This should be launched using url_launcher. The app needs to handle the callback via uni_links.
+  String getAuthorizationUrl(String requestToken) {
+    // Placeholder: Construct the authorization URL.
+    return 'https://getpocket.com/auth/authorize?request_token=$requestToken&redirect_uri=${Uri.encodeComponent(_redirectUri)}';
+  }
+
+  // Step 3: Convert the approved request token into an access token
+  Future<bool> obtainAccessToken() async {
+    // Placeholder: Implement Pocket API call to convert request token to access token.
+    // This is called after the user authorizes the app and is redirected back.
+    // The request token is retrieved from storage.
+    // POST to /oauth/authorize with consumer_key and the (request) code.
+    // Store the received access token securely.
+    // Return true on success, false on failure.
+    print('PocketService: Obtaining access token...');
+    final requestToken = await _secureStorage.read(key: _requestTokenKey);
+    if (requestToken == null) {
+      print('PocketService: No request token found to obtain access token.');
+      return false;
+    }
+
+    try {
+      final response = await _dio.post('/oauth/authorize', data: {
+        'consumer_key': _consumerKey,
+        'code': requestToken,
+      });
+
+      if (response.statusCode == 200 && response.data != null) {
+        final accessToken = response.data['access_token'] as String?;
+        // final username = response.data['username'] as String?; // Also available
+        if (accessToken != null) {
+          await _secureStorage.write(key: _accessTokenKey, value: accessToken);
+          await _secureStorage.delete(key: _requestTokenKey); // Clean up request token
+          print('PocketService: Access token obtained and stored.');
+          return true;
+        }
+      }
+      print('PocketService: Failed to obtain access token. Status: ${response.statusCode}, Data: ${response.data}');
+      return false;
+    } catch (e) {
+      print('PocketService: Error obtaining access token: $e');
       return false;
     }
   }
+
+  // Step 4: Fetch articles from Pocket
+  Future<List<ArticleModel>> fetchArticles({
+    String state = 'unread', // 'unread', 'archive', or 'all'
+    String sort = 'newest', // 'newest', 'oldest', 'title', or 'site'
+    String contentType = 'article', // 'article', 'video', or 'image'
+    int count = 30, // Number of items to retrieve
+    int offset = 0, // Offset for pagination
+  }) async {
+    // Placeholder: Implement Pocket API call to fetch articles.
+    // POST to /get with consumer_key, access_token, and other parameters.
+    // Transform the response into a List<ArticleModel>.
+    // Return the list of articles or an empty list on failure.
+    print('PocketService: Fetching articles...');
+    final accessToken = await _secureStorage.read(key: _accessTokenKey);
+    if (accessToken == null) {
+      print('PocketService: No access token found. Cannot fetch articles.');
+      return [];
+    }
+
+    try {
+      final response = await _dio.post('/get', data: {
+        'consumer_key': _consumerKey,
+        'access_token': accessToken,
+        'state': state,
+        'sort': sort,
+        'contentType': contentType,
+        'detailType': 'complete', // 'simple' or 'complete' for more details
+        'count': count,
+        'offset': offset,
+      });
+
+      if (response.statusCode == 200 && response.data != null) {
+        final list = response.data['list'] as Map<String, dynamic>?;
+        if (list == null || list.isEmpty) {
+          print('PocketService: No articles found or empty list returned.');
+          return [];
+        }
+
+        final articles = <ArticleModel>[];
+        list.forEach((key, value) {
+          final item = value as Map<String, dynamic>;
+          // Pocket API returns resolved_url or given_url.
+          // resolved_title or given_title.
+          // excerpt is often available.
+          // time_added is a Unix timestamp.
+          articles.add(
+            ArticleModel.create( // Using create will generate a new UUID, which is good for local storage
+              url: item['resolved_url'] ?? item['given_url'] ?? 'unknown_url',
+              title: item['resolved_title'] ?? item['given_title'] ?? 'Untitled',
+              excerpt: item['excerpt'] as String?,
+              // content: item['content'] as String?, // Pocket's 'content' is not the full article usually
+              source: 'Pocket',
+              // savedAt: item['time_added'] != null
+              //     ? DateTime.fromMillisecondsSinceEpoch((int.tryParse(item['time_added'].toString()) ?? 0) * 1000)
+              //     : DateTime.now(), // ArticleModel.create generates savedAt
+            ),
+          );
+        });
+        print('PocketService: Fetched ${articles.length} articles.');
+        return articles;
+      }
+      print('PocketService: Failed to fetch articles. Status: ${response.statusCode}, Data: ${response.data}');
+      return [];
+    } catch (e) {
+      print('PocketService: Error fetching articles: $e');
+      return [];
+    }
+  }
+
+  Future<void> logout() async {
+    // Placeholder: Clear stored access token.
+    await _secureStorage.delete(key: _accessTokenKey);
+    await _secureStorage.delete(key: _requestTokenKey);
+    print('PocketService: User logged out, tokens cleared.');
+  }
 }
+
+// It's good practice to also define a provider for this service in your Riverpod setup.
+// This would typically go in `article_providers.dart` or a dedicated `service_providers.dart`.
+// Example (would be in a providers file):
+// final pocketServiceProvider = Provider<PocketService>((ref) {
+//   return PocketService();
+// });
