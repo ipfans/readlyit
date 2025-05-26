@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // For potential state later
-import 'package:readlyit/l10n/app_localizations.dart'; // Import for localization
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readlyit/l10n/app_localizations.dart';
 
 // Example: Provider to manage the selected index if needed globally or across complex UI
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);

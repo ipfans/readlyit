@@ -9,7 +9,12 @@ ReadLyit is a "Read it Later" application for Android, iOS, and macOS, built wit
 *   **Article Content Fetching:** Fetches the main content of articles for an improved offline reading experience using HTML parsing.
 *   **Pocket Import:** Easily import your existing articles from Pocket (requires one-time authentication).
 *   **iCloud Synchronization (iOS & macOS):** Dart interface for iCloud synchronization is implemented. Native (Swift/Objective-C) CloudKit implementation is required by the developer to enable this feature. (Android sync functionality is planned for a future release).
-*   **Settings Screen:** Basic settings for Pocket account management and app information.
+*   **Settings Screen:** Configure application preferences, including:
+    *   Theme mode selection (Light, Dark, System).
+    *   Primary theme color selection.
+    *   In-app language selection (e.g., English, Chinese).
+    *   Pocket account management (status, logout, connect).
+    *   Information on system font size settings.
 *   **Modern UI/UX:**
     *   Beautiful and intuitive user interface.
     *   Adaptive layouts for optimal viewing on different screen sizes, including responsive List/Grid view for articles.
@@ -96,5 +101,4 @@ This is necessary, for example, after creating or updating mock definitions for 
 (To be added - guidelines for contributing to the project)
 
 ## License
-(To be added - e.g., MIT, Apache 2.0)
-```
+MIT

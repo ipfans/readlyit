@@ -122,5 +122,16 @@
             }
         }
     },
-    "pocketAuthSuccessImportStarting": "Pocket authentication successful! Starting article import..."
+    "pocketAuthSuccessImportStarting": "Pocket authentication successful! Starting article import...",
+    "settingsThemeModeTitle": "Theme Mode",
+    "settingsThemeModeSystem": "System",
+    "settingsThemeModeLight": "Light",
+    "settingsThemeModeDark": "Dark",
+    "settingsThemeColorTitle": "Theme Color",
+    "settingsLanguageTitle": "Language",
+    "languageNameEn": "English",
+    "languageNameZh": "Chinese",
+    "settingsFontSettingsTitle": "Font Settings",
+    "settingsFontSettingsDescription": "This app uses your device's system font size settings. You can adjust the font size in your phone's Display or Accessibility settings.",
+    "settingsPocketAuthRedirectPrompt": "Please authorize with Pocket in your browser. The app will continue once authorization is complete."
 }

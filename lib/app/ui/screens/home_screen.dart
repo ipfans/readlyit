@@ -130,6 +130,11 @@ class HomeScreen extends ConsumerWidget {
       context,
     ); // Cache ScaffoldMessenger
 
+  // Modify this method in HomeScreen
+  void _initiatePocketImport(BuildContext context, WidgetRef ref) async { // Make it async
+    final articlesNotifier = ref.read(articlesListProvider.notifier);
+    final scaffoldMessenger = ScaffoldMessenger.of(context); // Cache ScaffoldMessenger
+
     // Show some immediate feedback
     scaffoldMessenger.showSnackBar(
       const SnackBar(

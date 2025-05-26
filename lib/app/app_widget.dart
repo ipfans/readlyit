@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; 
 import 'package:readlyit/app/ui/screens/main_navigation_screen.dart'; // Add this
 import 'package:readlyit/l10n/app_localizations.dart';
-
-// Imports for uni_links
 import 'package:uni_links/uni_links.dart';
 import 'package:flutter/services.dart' show PlatformException;
-
-// Import your providers
 import 'package:readlyit/features/articles/presentation/providers/article_providers.dart';
+import 'package:readlyit/app/ui/theme/theme_providers.dart';
+import 'package:readlyit/l10n/language_providers.dart';
 
 
 class AppWidget extends ConsumerStatefulWidget { 
@@ -120,21 +118,30 @@ class _AppWidgetState extends ConsumerState<AppWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // WidgetRef is available via `ref` member in ConsumerState
+    final currentThemeMode = ref.watch(themeModeProvider);
+    final currentSeedColor = ref.watch(seedColorProvider);
+    final currentLocale = ref.watch(languageProvider); // Watch the language provider
+
     return MaterialApp(
-      title: 'ReadLyit',
-      themeMode: ThemeMode.system, 
+      // title: 'ReadLyit', // Replaced by onGenerateTitle
+      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle, // Better for localization
+
+      themeMode: currentThemeMode.currentMaterialThemeMode, // Use the getter
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
-        colorSchemeSeed: Colors.blueAccent, 
+        colorSchemeSeed: currentSeedColor.color, // Use selected seed color
+        // Add other common light theme customizations if any
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-        colorSchemeSeed: Colors.blueAccent, 
+        colorSchemeSeed: currentSeedColor.color, // Use selected seed color for dark theme too
+        // Add other common dark theme customizations if any
       ),
-      home: const MainNavigationScreen(), // Change this
+      locale: currentLocale, // Set the app's locale
+      home: const MainNavigationScreen(), 
       localizationsDelegates: AppLocalizations.localizationsDelegates, 
       supportedLocales: AppLocalizations.supportedLocales,     
       debugShowCheckedModeBanner: false,

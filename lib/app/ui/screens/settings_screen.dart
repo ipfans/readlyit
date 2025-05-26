@@ -1,132 +1,199 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:readlyit/features/articles/presentation/providers/article_providers.dart';
+import 'package:readlyit/app/ui/theme/theme_providers.dart'; 
+import 'package:readlyit/l10n/language_providers.dart';    
 import 'package:readlyit/l10n/app_localizations.dart';
-import 'package:readlyit/features/articles/presentation/providers/article_providers.dart'; // For Pocket & iCloud status/actions
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
+  // Helper to get display name for AppThemeMode
+  String _appThemeModeName(AppThemeMode mode, AppLocalizations l10n) {
+    switch (mode) {
+      case AppThemeMode.system:
+        return l10n.settingsThemeModeSystem;
+      case AppThemeMode.light:
+        return l10n.settingsThemeModeLight;
+      case AppThemeMode.dark:
+        return l10n.settingsThemeModeDark;
+    }
+  }
+  
+  // Helper to get display name for Locale
+  String _localeName(Locale locale, AppLocalizations l10n) {
+     if (locale.languageCode == 'en') return l10n.languageNameEn;
+     if (locale.languageCode == 'zh') return l10n.languageNameZh;
+     return locale.toLanguageTag(); // Fallback
+  }
+  
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final pocketAuthAsync = ref.watch(pocketIsAuthenticatedProvider);
+    final currentThemeMode = ref.watch(themeModeProvider);
+    final currentSeedColor = ref.watch(seedColorProvider);
+    final currentLocale = ref.watch(languageProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.bottomNavSettings), // Using existing localization key
+        title: Text(l10n.bottomNavSettings),
       ),
       body: ListView(
         children: <Widget>[
-          // --- Appearance Section ---
-          ListTile(
-            leading: const Icon(Icons.palette_outlined),
-            title: Text(l10n.settingsAppearanceTitle??"Appearance"), // New key: settingsAppearanceTitle
-            // subtitle: Text(l10n.settingsAppearanceSubtitle??"Change app theme (Light/Dark/System)"), // New key: settingsAppearanceSubtitle
-            // onTap: () {
-            //   // TODO: Implement theme selection dialog or navigation
-            //   ScaffoldMessenger.of(context).showSnackBar(
-            //     const SnackBar(content: Text('Theme settings coming soon!')),
-            //   );
-            // },
-          ),
-          // Example: Display current theme mode (read-only for now)
-          // This requires a provider for current theme choice if user can change it in-app.
-          // For now, we know AppWidget uses ThemeMode.system.
           Padding(
-            padding: const EdgeInsets.only(left: 72.0, right: 16.0, bottom: 8.0), // Align with ListTile content
-            child: Text(
-              l10n.settingsAppearanceCurrentSystem??"Currently following system theme.", // New key: settingsAppearanceCurrentSystem
-              style: Theme.of(context).textTheme.bodySmall,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Adjusted vertical padding
+            child: Text(l10n.settingsAppearanceTitle, style: Theme.of(context).textTheme.titleMedium),
+          ),
+          ListTile(
+            title: Text(l10n.settingsThemeModeTitle),
+            trailing: DropdownButton<AppThemeMode>(
+              value: currentThemeMode,
+              items: AppThemeMode.values.map((AppThemeMode mode) {
+                return DropdownMenuItem<AppThemeMode>(
+                  value: mode,
+                  child: Text(_appThemeModeName(mode, l10n)),
+                );
+              }).toList(),
+              onChanged: (AppThemeMode? newValue) {
+                if (newValue != null) {
+                  ref.read(themeModeProvider.notifier).setThemeMode(newValue);
+                }
+              },
+            ),
+          ),
+          ListTile(
+            title: Text(l10n.settingsThemeColorTitle),
+            trailing: DropdownButton<AppColorSeed>(
+              value: currentSeedColor,
+              items: availableSeedColors.map((AppColorSeed seed) {
+                return DropdownMenuItem<AppColorSeed>(
+                  value: seed,
+                  child: Row(
+                    children: [
+                      Icon(Icons.circle, color: seed.color, size: 16),
+                      const SizedBox(width: 8),
+                      Text(seed.label), 
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (AppColorSeed? newValue) {
+                if (newValue != null) {
+                  ref.read(seedColorProvider.notifier).setSeedColor(newValue);
+                }
+              },
             ),
           ),
           const Divider(),
 
-          // --- Pocket Integration Section ---
+          // --- Language Section ---
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text(l10n.settingsLanguageTitle, style: Theme.of(context).textTheme.titleMedium),
+          ),
           ListTile(
-            leading: const Icon(Icons.login_outlined), // Consider a Pocket specific icon
-            title: Text(l10n.settingsPocketTitle??"Pocket Integration"), // New key: settingsPocketTitle
+            title: Text(l10n.settingsLanguageTitle), 
+            trailing: DropdownButton<Locale>(
+              value: currentLocale,
+              items: availableAppLocales.map((Locale locale) { 
+                return DropdownMenuItem<Locale>(
+                  value: locale,
+                  child: Text(_localeName(locale, l10n)),
+                );
+              }).toList(),
+              onChanged: (Locale? newValue) {
+                if (newValue != null) {
+                  ref.read(languageProvider.notifier).setLanguage(newValue);
+                }
+              },
+            ),
+          ),
+          const Divider(),
+
+          // --- Font Settings Section ---
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text(l10n.settingsFontSettingsTitle, style: Theme.of(context).textTheme.titleMedium),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 8.0),
+            child: Text(
+              l10n.settingsFontSettingsDescription,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text(l10n.settingsPocketTitle, style: Theme.of(context).textTheme.titleMedium),
           ),
           pocketAuthAsync.when(
             data: (isAuthenticated) {
               if (isAuthenticated) {
                 return ListTile(
-                  leading: const SizedBox(width: 40), // Indent
-                  title: Text(l10n.settingsPocketStatusAuthenticated??"Authenticated with Pocket"), // New key: settingsPocketStatusAuthenticated
-                  // subtitle: Text("Username: ${pocketUsername}"), // TODO: Get username if available
+                  title: Text(l10n.settingsPocketStatusAuthenticated),
                   trailing: ElevatedButton(
-                    child: Text(l10n.settingsPocketLogoutButton??"Logout"), // New key: settingsPocketLogoutButton
+                    child: Text(l10n.settingsPocketLogoutButton),
                     onPressed: () async {
                       await ref.read(articlesListProvider.notifier).logoutFromPocket();
-                      ref.invalidate(pocketIsAuthenticatedProvider); // Refresh auth state
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.loggedOutFromPocket)), // Existing key
-                      );
+                      ref.invalidate(pocketIsAuthenticatedProvider);
+                      if (context.mounted) { 
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.loggedOutFromPocket)),
+                        );
+                      }
                     },
                   ),
                 );
               } else {
                 return ListTile(
-                  leading: const SizedBox(width: 40), // Indent
-                  title: Text(l10n.settingsPocketStatusNotAuthenticated??"Not connected to Pocket"), // New key: settingsPocketStatusNotAuthenticated
+                  leading: const SizedBox(width: 40), // Indent retained as per provided snippet
+                  title: Text(l10n.settingsPocketStatusNotAuthenticated),
                   trailing: ElevatedButton(
-                    child: Text(l10n.tooltipConnectToPocket), // Existing key
-                    onPressed: () {
-                      // This should trigger the same flow as the AppBar button
-                      // Need access to _initiatePocketImport from HomeScreen or replicate logic.
-                      // For now, just a placeholder action.
-                      // A better way would be to call a method on a provider that HomeScreen also uses.
-                      // Or navigate back/show a dialog telling user to use AppBar button.
-                      // For now:
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.settingsPocketLoginPrompt??"Please use the 'Connect to Pocket' option in the app bar on the main screen.")), // New key: settingsPocketLoginPrompt
-                      );
+                    child: Text(l10n.tooltipConnectToPocket), 
+                    onPressed: () async { 
+                      final articlesNotifier = ref.read(articlesListProvider.notifier);
+                      final scaffoldMessenger = ScaffoldMessenger.of(context); 
+                      final l10n_for_async = AppLocalizations.of(context)!; 
+
+                      final errorMessage = await articlesNotifier.initiatePocketAuthentication();
+
+                      if (scaffoldMessenger.mounted) { 
+                         if (errorMessage != null) {
+                             scaffoldMessenger.showSnackBar(
+                               SnackBar(content: Text(l10n_for_async.pocketSyncFailed(errorMessage))),
+                             );
+                         } else {
+                             scaffoldMessenger.showSnackBar(
+                               SnackBar(content: Text(l10n_for_async.settingsPocketAuthRedirectPrompt)),
+                             );
+                         }
+                      }
                     },
                   ),
                 );
               }
             },
-            loading: () => const ListTile(
-              leading: SizedBox(width: 40),
-              title: Center(child: CircularProgressIndicator()),
-            ),
-            error: (err, stack) => ListTile(
-              leading: const SizedBox(width: 40),
-              title: Text(l10n.settingsPocketStatusError??"Error checking Pocket status."), // New key: settingsPocketStatusError
+            loading: () => const ListTile(leading: SizedBox(width:40), title: Center(child: CircularProgressIndicator())),
+            error: (err, stack) => ListTile( 
+              leading: const SizedBox(width: 40), // Indent retained
+              title: Text(l10n.settingsPocketStatusError),
               subtitle: Text(err.toString()),
             ),
           ),
           const Divider(),
-
-          // --- iCloud Sync Section (Informational) ---
-          // This section should only be visible on iOS/macOS
-          // if (Platform.isIOS || Platform.isMacOS) ... // Requires dart:io import
-          ListTile(
-            leading: const Icon(Icons.cloud_sync_outlined),
-            title: Text(l10n.settingsICloudSyncTitle??"iCloud Sync (iOS/macOS)"), // New key: settingsICloudSyncTitle
-            // TODO: Add subtitle with last sync status/time if available from ICloudService
-            // subtitle: Text("Last synced: ${_iCloudService?.lastSyncTime ?? 'Never'}"),
-          ),
-          // Example: Placeholder for actual sync status
           Padding(
-            padding: const EdgeInsets.only(left: 72.0, right: 16.0, bottom: 8.0),
-            child: Text(
-              l10n.settingsICloudSyncStatusPlaceholder??"Sync status will be shown here.", // New key: settingsICloudSyncStatusPlaceholder
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text(l10n.settingsICloudSyncTitle, style: Theme.of(context).textTheme.titleMedium),
           ),
-
-          // --- Other Potential Settings ---
-          // const Divider(),
-          // ListTile(
-          //   leading: const Icon(Icons.storage_outlined),
-          //   title: Text(l10n.settingsManageStorageTitle??"Manage Storage"), // New key
-          //   onTap: () { /* TODO */ },
-          // ),
-          // ListTile(
-          //   leading: const Icon(Icons.info_outline),
-          //   title: Text(l10n.settingsAboutTitle??"About ReadlyIt"), // New key
-          //   onTap: () { /* TODO: Show app version, licenses etc. */ },
-          // ),
+          Padding(
+             padding: const EdgeInsets.only(left: 16.0, right: 16.0, top:8.0, bottom: 16.0),
+             child: Text(
+               l10n.settingsICloudSyncStatusPlaceholder,
+               style: Theme.of(context).textTheme.bodyMedium,
+             ),
+          ),
         ],
       ),
     );
