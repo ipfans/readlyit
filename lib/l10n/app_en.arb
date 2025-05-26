@@ -99,5 +99,28 @@
                 "example": "Settings"
             }
         }
-    }
+    },
+    "settingsAppearanceTitle": "Appearance",
+    "settingsAppearanceCurrentSystem": "Currently following system theme.",
+    "settingsPocketTitle": "Pocket Integration",
+    "settingsPocketStatusAuthenticated": "Authenticated with Pocket",
+    "settingsPocketLogoutButton": "Logout",
+    "settingsPocketStatusNotAuthenticated": "Not connected to Pocket",
+    "settingsPocketLoginPrompt": "Please use the 'Connect to Pocket' option in the app bar on the main screen.",
+    "settingsPocketStatusError": "Error checking Pocket status.",
+    "settingsICloudSyncTitle": "iCloud Sync (iOS/macOS)",
+    "settingsICloudSyncStatusPlaceholder": "Sync status will be shown here.",
+    "pocketImportInProgress": "Pocket import in progress...",
+    "pocketImportSuccessNoArticles": "Pocket sync successful. No new articles found.",
+    "pocketImportSuccessArticles": "Pocket sync successful. Imported {count} new articles.",
+    "@pocketImportSuccessArticles": {
+        "description": "Success message when Pocket articles are imported",
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "example": "5"
+            }
+        }
+    },
+    "pocketAuthSuccessImportStarting": "Pocket authentication successful! Starting article import..."
 }

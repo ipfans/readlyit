@@ -17,25 +17,17 @@ class ArticleViewScreen extends ConsumerWidget {
       try {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } catch (e) {
-        if (_isMounted(context)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.errorCouldNotLaunchUrlGeneral(e.toString()),
-              ),
-            ),
+        if (mounted(context)) {
+           ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.errorCouldNotLaunchUrlGeneral(e.toString()))),
           );
         }
         print('Error launching URL: $e');
       }
     } else {
-      if (_isMounted(context)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.errorCouldNotLaunchUrl(url),
-            ),
-          ),
+      if (mounted(context)) {
+         ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.errorCouldNotLaunchUrl(url))),
         );
       }
       print('Could not launch $url');
@@ -183,7 +175,7 @@ class ArticleViewScreen extends ConsumerWidget {
                     ),
                   )
                 else if (currentArticle.content != null && currentArticle.content!.isEmpty)
-                   Center( // If content is fetched but empty string
+                   Center(
                      child: Padding(
                        padding: const EdgeInsets.all(16.0),
                        child: Text(

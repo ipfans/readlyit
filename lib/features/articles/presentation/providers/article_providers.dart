@@ -341,24 +341,44 @@ class ArticlesListNotifier extends StateNotifier<AsyncValue<List<ArticleModel>>>
   }
 
   Future<String?> completePocketAuthenticationAndFetchArticles() async {
-    // Returns an error message string if failed, null if successful
     final pocketService = _ref.read(pocketServiceProvider);
+    String? errorMessage;
+    int importedCount = 0;
+
+    // Initial check for access token before setting importing state
+    // This part of the logic is more about *obtaining* the token, 
+    // the import itself starts after token is confirmed.
+    bool accessTokenObtained = false;
     try {
-      final success = await pocketService.obtainAccessToken();
-      if (success) {
-        final articles = await pocketService.fetchArticles();
-        // No need to check if articles.isNotEmpty here, addImportedArticles can handle empty list
-        await addImportedArticles(articles); // Use existing method to add to DB and refresh UI
-        print('[ArticlesListNotifier] Pocket authentication successful, ${articles.length} articles fetched.');
-        return null; 
-      } else {
+      accessTokenObtained = await pocketService.obtainAccessToken();
+      if (!accessTokenObtained) {
         print('[ArticlesListNotifier] Failed to obtain Pocket access token.');
-        return 'Failed to obtain Pocket access token.';
+        return 'Failed to obtain Pocket access token.'; // Use a localized string key later
       }
     } catch (e) {
-      print('[ArticlesListNotifier] Error completing Pocket authentication or fetching articles: $e');
-      return 'An error occurred while finalizing Pocket setup: ${e.toString()}';
+        print('[ArticlesListNotifier] Error obtaining Pocket access token: $e');
+        return 'An error occurred while obtaining access token: ${e.toString()}'; // Use a localized string key later
     }
+
+    // If access token was obtained, proceed with fetching and importing
+    _ref.read(pocketIsImportingProvider.notifier).state = true;
+    try {
+      final articles = await pocketService.fetchArticles();
+      importedCount = articles.length; // Get count before adding
+      if (articles.isNotEmpty) { // Only call addImportedArticles if there's something to add
+           await addImportedArticles(articles);
+      }
+      print('[ArticlesListNotifier] Pocket articles processed, count: ${articles.length}.');
+      // errorMessage remains null for success
+    } catch (e) {
+      print('[ArticlesListNotifier] Error fetching or adding Pocket articles: $e');
+      errorMessage = 'An error occurred during article import: ${e.toString()}'; // Use a localized string key later
+    } finally {
+      // Set importing status to false
+      _ref.read(pocketIsImportingProvider.notifier).state = false;
+    }
+    
+    return errorMessage; // Which is null if successful
   }
 
   Future<void> logoutFromPocket() async {
@@ -408,3 +428,6 @@ final pocketIsAuthenticatedProvider = FutureProvider<bool>((ref) async {
 //   final databaseService = ref.watch(databaseServiceProvider);
 //   return databaseService.getArticle(id);
 // });
+
+// 8. Provider to indicate if Pocket import is in progress
+final pocketIsImportingProvider = StateProvider<bool>((ref) => false);

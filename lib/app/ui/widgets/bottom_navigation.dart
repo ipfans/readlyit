@@ -33,13 +33,6 @@ class CustomBottomNavigation extends ConsumerWidget { // Changed to ConsumerWidg
       currentIndex: currentIndex,
       onTap: (index) {
         ref.read(bottomNavIndexProvider.notifier).state = index;
-        // TODO: Implement actual navigation based on index
-        // For now, just show a SnackBar
-        String pageName = index == 0 ? L10n.bottomNavArticles : L10n.bottomNavSettings; // Localized pageName
-        ScaffoldMessenger.of(context).removeCurrentSnackBar(); // Remove previous snackbar
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(L10n.navigatedToPagePlaceholder(pageName))), // Localized SnackBar
-        );
       },
     );
   }

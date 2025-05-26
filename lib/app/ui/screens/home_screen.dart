@@ -101,6 +101,11 @@ class HomeScreen extends ConsumerWidget {
     final articlesNotifier = ref.read(articlesListProvider.notifier);
     final scaffoldMessenger = ScaffoldMessenger.of(context); // Cache ScaffoldMessenger
 
+  // Modify this method in HomeScreen
+  void _initiatePocketImport(BuildContext context, WidgetRef ref) async { // Make it async
+    final articlesNotifier = ref.read(articlesListProvider.notifier);
+    final scaffoldMessenger = ScaffoldMessenger.of(context); // Cache ScaffoldMessenger
+
     // Show some immediate feedback
     scaffoldMessenger.showSnackBar(
       const SnackBar(content: Text('Connecting to Pocket...')), // Replace with localized string
@@ -125,12 +130,14 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final articlesAsyncValue = ref.watch(articlesListProvider);
+    // final isPocketImporting = ref.watch(pocketIsImportingProvider); // REMOVE: This is now handled by MainNavigationScreen
 
     return Scaffold(
       appBar: custom_widgets.CustomAppBar(
         titleText: AppLocalizations.of(context)!.homeScreenTitle, // Localized AppBar title
         onPocketImport: () => _initiatePocketImport(context, ref), // Pass the callback
       ),
+      // REVERT: Body back to directly being articlesAsyncValue.when(...)
       body: articlesAsyncValue.when(
         data: (articles) {
           if (articles.isEmpty) {

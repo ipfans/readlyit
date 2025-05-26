@@ -1,7 +1,7 @@
 import 'dart:async'; // For StreamSubscription
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; 
-import 'package:readlyit/app/ui/screens/home_screen.dart';
+import 'package:readlyit/app/ui/screens/main_navigation_screen.dart'; // Add this
 import 'package:readlyit/l10n/app_localizations.dart';
 
 // Imports for uni_links
@@ -77,25 +77,30 @@ class _AppWidgetState extends ConsumerState<AppWidget> {
     print('uni_links: Received incoming URI: $uri');
     // Check if this is the Pocket auth callback
     if (uri.scheme == 'readlyit' && uri.host == 'pocket-auth') {
-      final scaffoldMessenger = ScaffoldMessenger.maybeOf(context);
+      // `context` here is from _AppWidgetState, which should have AppLocalizations in scope
+      final L10n = AppLocalizations.of(context)!; 
+      final scaffoldMessenger = ScaffoldMessenger.maybeOf(context); // Use maybeOf for safety
       
+      // Show initial SnackBar indicating auth success and import starting
       scaffoldMessenger?.showSnackBar(
-        const SnackBar(content: Text('Finalizing Pocket authentication...')),
+        SnackBar(content: Text(L10n.pocketAuthSuccessImportStarting)),
       );
 
       ref.read(articlesListProvider.notifier)
           .completePocketAuthenticationAndFetchArticles()
           .then((errorMessage) {
         if (mounted) { 
+          // Re-fetch L10n in case context changed, though unlikely for this specific callback structure
+          // final currentL10n = AppLocalizations.of(context)!; 
           if (errorMessage != null) {
             print('Pocket auth callback: Error - $errorMessage');
             scaffoldMessenger?.showSnackBar(
-              SnackBar(content: Text('Pocket Authentication Failed: $errorMessage')), 
+              SnackBar(content: Text(L10n.pocketSyncFailed(errorMessage))), 
             );
           } else {
             print('Pocket auth callback: Success!');
             scaffoldMessenger?.showSnackBar(
-              const SnackBar(content: Text('Pocket Authentication Successful! Articles imported.')), 
+              SnackBar(content: Text(L10n.pocketSyncSuccessful)), // Using consistent success message
             );
             ref.invalidate(pocketIsAuthenticatedProvider);
           }
@@ -103,8 +108,9 @@ class _AppWidgetState extends ConsumerState<AppWidget> {
       }).catchError((e) {
         print('Pocket auth callback: Error calling completePocketAuthenticationAndFetchArticles: $e');
         if (mounted) {
+           // final currentL10n = AppLocalizations.of(context)!;
           scaffoldMessenger?.showSnackBar(
-              SnackBar(content: Text('Error processing Pocket login: ${e.toString()}')) 
+              SnackBar(content: Text(L10n.pocketSyncFailed(e.toString()))) // Use localized error
           );
         }
       });
@@ -128,7 +134,7 @@ class _AppWidgetState extends ConsumerState<AppWidget> {
         brightness: Brightness.dark,
         colorSchemeSeed: Colors.blueAccent, 
       ),
-      home: const HomeScreen(), 
+      home: const MainNavigationScreen(), // Change this
       localizationsDelegates: AppLocalizations.localizationsDelegates, 
       supportedLocales: AppLocalizations.supportedLocales,     
       debugShowCheckedModeBanner: false,
