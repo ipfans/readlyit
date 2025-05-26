@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:readlyit/app/ui/screens/home_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import generated localizations
+import 'package:readlyit/main.dart'; // Import main.dart to access MyHomePage for now
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});

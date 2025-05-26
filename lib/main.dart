@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:readlyit/app/app_widget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
   // For Riverpod, we need to wrap the entire application in a ProviderScope
